@@ -1,6 +1,6 @@
 require 'isu4'
 
-cookie = Isu4::Cookie.new()
+cookie = Isu4::Cookie.new
 notice = cookie.get("notice")
 
 if notice.nil? then
@@ -62,7 +62,6 @@ html = <<-EOH
           </div>
         </form>
       </div>
-
     </div>
 
   </body>
@@ -70,3 +69,4 @@ html = <<-EOH
 EOH
 
 Nginx.echo html
+Nginx.return Nginx::HTTP_OK
