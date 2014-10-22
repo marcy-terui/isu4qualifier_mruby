@@ -1,5 +1,6 @@
-v    = Nginx::Var
-hout = Nginx::Headers_out.new
+v     = Nginx::Var
+hout  = Nginx::Headers_out.new
+redis = Redis.new "127.0.0.1", 6379
 
 req = {}
 request_body = v.request_body
@@ -10,8 +11,6 @@ unless request_body.nil? then
     req[key] = val
   end
 end
-
-redis  = Redis.new "127.0.0.1", 6379
 
 login = req.key?("login") ? req[:login] : nil
 pass  = req.key?("password") ? req[:password] : nil

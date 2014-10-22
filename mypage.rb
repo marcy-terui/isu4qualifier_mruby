@@ -1,4 +1,5 @@
-r = Nginx::Request.new
+r     = Nginx::Request.new
+redis = Redis.new "127.0.0.1", 6379
 
 req = {}
 cookie_str  = r.headers_in['Cookie']
