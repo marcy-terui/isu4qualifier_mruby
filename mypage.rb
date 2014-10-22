@@ -10,11 +10,11 @@ if login.nil? then
   Nginx.redirect "/"
 end
 
-user = redis.get_last_login(login)
+last_login = redis.get_last_login(login)
 
-created_at = user[:created_at]
-ip         = user[:ip]
-login      = user[:login]
+created_at = last_login[:created_at]
+ip         = last_login[:ip]
+login      = last_login[:login]
 
 html = <<-EOH
 <!DOCTYPE html>
