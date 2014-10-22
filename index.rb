@@ -1,4 +1,4 @@
-r   = Nginx::Request.new
+r = Nginx::Request.new
 
 req = {}
 args = r.args

@@ -1,6 +1,4 @@
-r   = Nginx::Request.new
-hin = Nginx::Headers_in.new
-v   = Nginx::Var
+r = Nginx::Request.new
 
 req = {}
 args = r.args
@@ -15,7 +13,7 @@ end
 login = req.key?("login") ? req[:login] : nil
 
 if login.nil? then
-  Nginx.redirect "http://#{v.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "http://#{r.var.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
 else
   Nginx.return Nginx::DECLINED
 end
