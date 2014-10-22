@@ -14,7 +14,8 @@ end
 login = req.key?("login") ? req[:login] : nil
 
 if login.nil? then
-  Nginx.redirect "/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "/?notice=You+must+be+logged+in"
+  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 else
   Nginx.return Nginx::DECLINED
 end
