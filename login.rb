@@ -33,7 +33,7 @@ if user_fail >= 3 then
   Nginx.redirect "http://#{r.var.http_host}/?notice=This+account+is+locked.", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
-if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:password_hash] then
+if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user['salt']}") == user['password_hash'] then
   redis.del("ip_fail_#{ip}")
   redis.del("user_fail_#{login}")
   if redis.exists?("now_login_#{login}") then
