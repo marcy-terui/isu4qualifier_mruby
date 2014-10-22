@@ -15,6 +15,8 @@ login = req.key?("login") ? req[:login] : nil
 
 last_login = redis.exists?("last_login_#{login}") ? {created_at: redis.hget("last_login_#{login}", "created_at"), ip: redis.hget("last_login_#{login}", "ip")} : {}
 
+redis.close
+
 created_at = last_login[:created_at]
 ip         = last_login[:ip]
 login      = last_login[:login]

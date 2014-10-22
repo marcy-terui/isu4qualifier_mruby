@@ -24,6 +24,7 @@ if ip_fail >= 10 then
   redis.incr("user_fail_#{login}") unless login.nil?
   cookie = "notice=You're banned.;"
   hout["Set-Cookie"] = cookie
+  redis.close
   Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
@@ -33,6 +34,7 @@ if user_fail >= 3 then
   redis.incr("user_fail_#{login}")
   cookie = "notice=This account is locked.;"
   hout["Set-Cookie"] = cookie
+  redis.close
   Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
@@ -47,9 +49,11 @@ if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:p
   redis.hset("now_login_#{login}", "ip", ip)
   cookie = "login=#{login};"
   hout["Set-Cookie"] = cookie
+  redis.close
   Nginx.redirect "/mypage", Nginx::HTTP_MOVED_TEMPORARILY
 else
   cookie = "notice=Wrong username or password;"
   hout["Set-Cookie"] = cookie
+  redis.close
   Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
 end

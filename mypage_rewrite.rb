@@ -17,4 +17,6 @@ if login.nil? then
   cookie = "notice=You must be logged in;"
   hout["Set-Cookie"] = cookie
   Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
+else
+  Nginx.return Nginx::DECLINED
 end
