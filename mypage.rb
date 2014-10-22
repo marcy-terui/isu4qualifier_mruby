@@ -1,16 +1,23 @@
-require 'isu4'
+r = Nginx::Request.new
 
-redis  = Isu4::Redis.new
-cookie = Isu4::Cookie.new
+req = {}
+cookie_str  = r.headers_in['Cookie']
+cookie_list = cookie_str.split("; ")
+cookie_list.each do |cookie|
+  key, val = cookie.split("=")
+  req[key] = val
+end
 
-login = cookie.get("login")
+login = req.key?("login") ? req[:login] : nil
 
 if login.nil? then
-  cookie.set("notice", "You must be logged in")
+  hout = Nginx::Headers_out.new
+  cookie = "notice=You must be logged in;"
+  hout["Set-Cookie"] = cookie
   Nginx.redirect "/"
 end
 
-last_login = redis.get_last_login(login)
+last_login = redis.exists?("last_login_#{login}") ? {created_at: redis.hget("last_login_#{login}", "created_at"), ip: redis.hget("last_login_#{login}", "ip")} : {}
 
 created_at = last_login[:created_at]
 ip         = last_login[:ip]

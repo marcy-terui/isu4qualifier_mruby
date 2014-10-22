@@ -1,7 +1,14 @@
-require 'isu4'
+r = Nginx::Request.new
 
-cookie = Isu4::Cookie.new
-notice = cookie.get("notice")
+req = {}
+cookie_str  = r.headers_in['Cookie']
+cookie_list = cookie_str.split("; ")
+cookie_list.each do |cookie|
+  key, val = cookie.split("=")
+  req[key] = val
+end
+
+notice = req.key?("notice") ? req[:notice] : nil
 
 if notice.nil? then
   notice_message = ""
