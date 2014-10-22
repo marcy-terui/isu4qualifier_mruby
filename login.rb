@@ -15,7 +15,7 @@ login = req.key?("login") ? req['login'] : nil
 pass  = req.key?("password") ? req['password'] : nil
 ip    = r.var.remote_addr
 
-user = redis.exists?("user_#{login}") ? {login: redis.hget("user_#{login}", "login"), password_hash: redis.hget("user_#{login}", "password_hash"), salt: redis.hget("user_#{login}", "salt")} : nil
+user = redis.exists?("user_#{login}") ? {'login' => redis.hget("user_#{login}", "login"), 'password_hash' => redis.hget("user_#{login}", "password_hash"), 'salt' => redis.hget("user_#{login}", "salt")} : nil
 
 ip_fail = redis.exists?("ip_fail_#{ip}") ? redis.get("ip_fail_#{ip}").to_i : 0
 if ip_fail >= 10 then
