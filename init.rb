@@ -13,11 +13,11 @@ now_login = {}
 users     = {}
 
 db.query('SELECT login, ip, succeeded, created_at FROM login_log').each do |log|
-  if succeeded == 1 then
+  if log['succeeded'] == 1 then
     Redis.current.del("ip_fail_#{log['ip']}")
     Redis.current.del("user_fail_#{log['login']}")
     Redis.current.mapped_hmset("last_login_#{log['login']}", now_login[log['login']]) if now_login.key?(log['login'])
-    now_login[login] = {created_at: log['created_at'], ip: log['ip']}
+    now_login[log['login']] = log
   else
     Redis.current.incr("ip_fail_#{log['ip']}")
     Redis.current.incr("user_fail_#{log['login']}")
