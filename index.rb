@@ -1,16 +1,16 @@
 r = Nginx::Request.new
 
 req = {}
-args = r.var.args
+args = r.args
 unless args.nil? then
   arg_list = args.split("&")
-  arg_list.each do |cookie|
-    key, val = cookie.split("=")
+  arg_list.each do |arg|
+    key, val = arg.split("=")
     req[key] = val.gsub("+", " ")
   end
 end
 
-notice = req.key?("notice") ? req[:notice] : nil
+notice = req.key?("notice") ? req['notice'] : nil
 
 if notice.nil? then
   notice_message = ""
