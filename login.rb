@@ -3,10 +3,12 @@ hout = Nginx::Headers_out.new
 
 req = {}
 request_body = v.request_body
-post_list = request_body.split("&")
-post_list.each do |post|
-  key, val = post.split("=")
-  req[key] = val
+unless request_body.nil? then
+  post_list = request_body.split("&")
+  post_list.each do |post|
+    key, val = post.split("=")
+    req[key] = val
+  end
 end
 
 redis  = Redis.new "127.0.0.1", 6379
