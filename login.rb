@@ -17,24 +17,20 @@ ip    = r.var.http_x_forwarded_for
 
 user = redis.exists?("user_#{login}") ? {login: redis.hget("user_#{login}", "login"), password_hash: redis.hget("user_#{login}", "password_hash"), salt: redis.hget("user_#{login}", "salt")} : nil
 
-ip_fail = redis.exists?("ip_fail_#{ip}") ? redis.get("ip_fail_#{ip}") : 0
+ip_fail = redis.exists?("ip_fail_#{ip}") ? redis.get("ip_fail_#{ip}").to_i : 0
 if ip_fail >= 10 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}") unless login.nil?
-  cookie = "notice=You're+banned.; path=/"
-  r.headers_out["Set-Cookie"] = cookie
   redis.close
-  Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "/?notice=You're+banned.", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
-user_fail = redis.exists?("user_fail_#{login}") ? redis.get("user_fail_#{login}") : 0
+user_fail = redis.exists?("user_fail_#{login}") ? redis.get("user_fail_#{login}").to_i : 0
 if user_fail >= 3 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}")
-  cookie = "notice=This+account+is+locked.; path=/"
-  r.headers_out["Set-Cookie"] = cookie
   redis.close
-  Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "/?notice=This+account+is+locked.", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
 if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:password_hash] then
@@ -46,13 +42,9 @@ if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:p
   end
   redis.hset("now_login_#{login}", "created_at", Time.now.strftime("%Y-%m-%d %H:%M:%S"))
   redis.hset("now_login_#{login}", "ip", ip)
-  cookie = "login=#{login}; path=/"
-  r.headers_out["Set-Cookie"] = cookie
   redis.close
-  Nginx.redirect "/mypage", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "/mypage?login=#{login}", Nginx::HTTP_MOVED_TEMPORARILY
 else
-  cookie = "notice=Wrong+username+or+password; path=/"
-  r.headers_out["Set-Cookie"] = cookie
   redis.close
-  Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "/?notice=Wrong+username+or+password", Nginx::HTTP_MOVED_TEMPORARILY
 end

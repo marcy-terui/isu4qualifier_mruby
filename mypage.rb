@@ -3,10 +3,10 @@ hin   = Nginx::Headers_in.new
 redis = Redis.new "127.0.0.1", 6379
 
 req = {}
-cookie_str  = hin['Cookie']
-unless cookie_str.nil? then
-  cookie_list = cookie_str.split("; ")
-  cookie_list.each do |cookie|
+args = r.args
+unless args.nil? then
+  arg_list = args.split("&")
+  arg_list.each do |cookie|
     key, val = cookie.split("=")
     req[key] = val.gsub("+", " ")
   end
