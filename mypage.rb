@@ -7,7 +7,7 @@ unless cookie_str.nil? then
   cookie_list = cookie_str.split("; ")
   cookie_list.each do |cookie|
     key, val = cookie.split("=")
-    req[key] = val
+    req[key] = val.gsub("+", " ")
   end
 end
 
