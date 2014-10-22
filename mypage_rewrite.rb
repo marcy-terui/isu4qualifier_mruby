@@ -13,9 +13,8 @@ end
 login = req.key?("login") ? req[:login] : nil
 
 if login.nil? then
-  hout = Nginx::Headers_out.new
-  cookie = "notice=You+must+be+logged+in"
-  hout["Set-Cookie"] = cookie
+  cookie = "notice=You+must+be+logged+in; path=/"
+  r.headers_out["Set-Cookie"] = cookie
   Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
 else
   Nginx.return Nginx::DECLINED
