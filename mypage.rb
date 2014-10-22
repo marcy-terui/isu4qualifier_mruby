@@ -13,13 +13,6 @@ end
 
 login = req.key?("login") ? req[:login] : nil
 
-if login.nil? then
-  hout = Nginx::Headers_out.new
-  cookie = "notice=You must be logged in;"
-  hout["Set-Cookie"] = cookie
-  Nginx.redirect "/", Nginx::HTTP_MOVED_TEMPORARILY
-end
-
 last_login = redis.exists?("last_login_#{login}") ? {created_at: redis.hget("last_login_#{login}", "created_at"), ip: redis.hget("last_login_#{login}", "ip")} : {}
 
 created_at = last_login[:created_at]
