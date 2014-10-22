@@ -1,5 +1,6 @@
 r     = Nginx::Request.new
 redis = Redis.new "127.0.0.1", 6379
+v     = Nginx::Var
 
 req = {}
 request_body = r.var.request_body
@@ -22,8 +23,7 @@ if ip_fail >= 10 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}") unless login.nil?
   redis.close
-  Nginx.redirect "/?notice=You're+banned."
-  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "http://#{v.http_host}/?notice=You're+banned.", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
 user_fail = redis.exists?("user_fail_#{login}") ? redis.get("user_fail_#{login}").to_i : 0
@@ -31,8 +31,7 @@ if user_fail >= 3 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}")
   redis.close
-  Nginx.redirect "/?notice=This+account+is+locked."
-  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "http://#{v.http_host}/?notice=This+account+is+locked.", Nginx::HTTP_MOVED_TEMPORARILY
 end
 
 if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:password_hash] then
@@ -45,10 +44,8 @@ if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user[:salt]}") == user[:p
   redis.hset("now_login_#{login}", "created_at", Time.now.strftime("%Y-%m-%d %H:%M:%S"))
   redis.hset("now_login_#{login}", "ip", ip)
   redis.close
-  Nginx.redirect "/mypage?login=#{login}"
-  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "http://#{v.http_host}/mypage?login=#{login}", Nginx::HTTP_MOVED_TEMPORARILY
 else
   redis.close
-  Nginx.redirect "/?notice=Wrong+username+or+password"
-  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
+  Nginx.redirect "http://#{v.http_host}/?notice=Wrong+username+or+password", Nginx::HTTP_MOVED_TEMPORARILY
 end
