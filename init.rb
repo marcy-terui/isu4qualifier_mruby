@@ -7,7 +7,7 @@ db = Mysql2::Client.new(
   database: 'isu4_qualifier'
 )
 
-Redis.current.flashall
+Redis.current.flushall
 
 now_login = {}
 users     = {}
