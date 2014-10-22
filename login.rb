@@ -13,7 +13,7 @@ end
 
 login = req.key?("login") ? req[:login] : nil
 pass  = req.key?("password") ? req[:password] : nil
-ip    = v.http_x_forwarded_for
+ip    = r.var.http_x_forwarded_for
 
 user = redis.exists?("user_#{login}") ? {login: redis.hget("user_#{login}", "login"), password_hash: redis.hget("user_#{login}", "password_hash"), salt: redis.hget("user_#{login}", "salt")} : nil
 

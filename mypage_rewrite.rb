@@ -1,7 +1,8 @@
-r = Nginx::Request.new
+r   = Nginx::Request.new
+hin = Nginx::Headers_in.new
 
 req = {}
-cookie_str  = r.headers_in['Cookie']
+cookie_str  = hin['Cookie']
 unless cookie_str.nil? then
   cookie_list = cookie_str.split("; ")
   cookie_list.each do |cookie|
