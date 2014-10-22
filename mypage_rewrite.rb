@@ -1,7 +1,7 @@
 r = Nginx::Request.new
 
 req = {}
-args = r.args
+args = r.var.args
 unless args.nil? then
   arg_list = args.split("&")
   arg_list.each do |cookie|

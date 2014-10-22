@@ -3,7 +3,7 @@ hin   = Nginx::Headers_in.new
 redis = Redis.new "127.0.0.1", 6379
 
 req = {}
-args = r.args
+args = r.var.args
 unless args.nil? then
   arg_list = args.split("&")
   arg_list.each do |cookie|
