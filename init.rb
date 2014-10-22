@@ -10,6 +10,7 @@ db = Mysql2::Client.new(
 Redis.current.flashall
 
 now_login = {}
+users     = {}
 
 db.query('SELECT login, ip, succeeded, created_at FROM login_log').each do |login, ip, succeeded, created_at|
   if succeeded == 1 then
@@ -23,9 +24,12 @@ db.query('SELECT login, ip, succeeded, created_at FROM login_log').each do |logi
   end
 end
 
-db.query('SELECT login, password_hash, salt FROM users').each do |login, password_hash, salt|
-  users[login] = {login: login, password_hash: password_hash, salt: salt}
-  users.each do |key, val|
-    Redis.current.hmset("user_#{key}", val.to_a.flatten)
+db.query('SELECT login, password_hash, salt FROM users').each_slice(10000) do |users|
+  fork do
+    users.each do |user|
+      Redis.current.hmset("user_#{user[:login]}", user.to_a.flatten)
+    end
   end
 end
+
+Process.waitall
