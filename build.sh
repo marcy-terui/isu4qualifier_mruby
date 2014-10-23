@@ -3,10 +3,10 @@
 yum -y install redis hiredis hiredis-devel pcre-devel
 gem install rake
 
-$SRC_ROOT=/usr/local/src
-$NGINX_VER="1.7.6"
-$NGINX_SRC=$SRC_ROOT/nginx-$NGINX_VER
-$NGX_MRUBY_SRC=$SRC_ROOT/ngx_mruby
+SRC_ROOT=/usr/local/src
+NGINX_VER="1.7.6"
+NGINX_SRC=$SRC_ROOT/nginx-$NGINX_VER
+NGX_MRUBY_SRC=$SRC_ROOT/ngx_mruby
 
 cd $SRC_ROOT
 wget http://nginx.org/download/nginx-$NGINX_VER.tar.gz
