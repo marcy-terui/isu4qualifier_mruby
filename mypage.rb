@@ -3,7 +3,7 @@ hin   = Nginx::Headers_in.new
 redis = Redis.new "127.0.0.1", 6379
 
 req = {}
-args = r.args
+args = r.var.args
 unless args.nil? then
   arg_list = args.split("&")
   arg_list.each do |arg|
@@ -14,7 +14,7 @@ end
 
 login = req.key?("login") ? req['login'] : nil
 
-last_login = redis.exists?("last_login_#{login}") ? {created_at: redis.hget("last_login_#{login}", "created_at"), ip: redis.hget("last_login_#{login}", "ip")} : {}
+last_login = redis.exists?("last_login_#{login}") ? {'created_at' => redis.hget("last_login_#{login}", "created_at"), 'ip' => redis.hget("last_login_#{login}", "ip")} : {}
 
 redis.close
 

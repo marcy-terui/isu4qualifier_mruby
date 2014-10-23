@@ -40,7 +40,20 @@ if !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user['salt']}") == user['
     redis.hset("last_login_#{login}", "created_at", redis.hget("now_login_#{login}", "created_at"))
     redis.hset("last_login_#{login}", "ip", redis.hget("now_login_#{login}", "ip"))
   end
-  redis.hset("now_login_#{login}", "created_at", Time.now.strftime("%Y-%m-%d %H:%M:%S"))
+  year  = Time.now.year
+  month = Time.now.month
+  day   = Time.now.day
+  hour  = Time.now.hour
+  min   = Time.now.min
+  sec   = Time.now.sec
+
+  month = month < 10 ? "0#{month.to_s}" : month.to_s
+  day   = day < 10 ? "0#{day.to_s}" : day.to_s
+  hour  = hour < 10 ? "0#{hour.to_s}" : hour.to_s
+  min   = min < 10 ? "0#{min.to_s}" : min.to_s
+  sec   = sec < 10 ? "0#{sec.to_s}" : sec.to_s
+
+  redis.hset("now_login_#{login}", "created_at", "#{year}-#{month}-#{day} #{hour}:#{min}:#{sec}")
   redis.hset("now_login_#{login}", "ip", ip)
   redis.close
   Nginx.redirect "http://#{r.var.http_host}/mypage?login=#{login}", Nginx::HTTP_MOVED_TEMPORARILY
