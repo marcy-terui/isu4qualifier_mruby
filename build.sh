@@ -22,11 +22,11 @@ make build_mruby
 make generate_gems_config
 
 cd $NGINX_SRC
-git clone https://github.com/tszming/nginx-rewrite-request-body-module.git
+git clone https://github.com/calio/form-input-nginx-module.git
 ./configure --prefix=/usr/local/nginx \
 --add-module=$NGX_MRUBY_SRC \
 --add-module=$NGX_MRUBY_SRC/dependence/ngx_devel_kit \
---add-module=$NGINX_SRC/nginx-rewrite-request-body-module \
+--add-module=$NGINX_SRC/form-input-nginx-module \
 --with-http_realip_module \
 --with-pcre-jit
 
