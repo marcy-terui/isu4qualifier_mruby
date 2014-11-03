@@ -6,7 +6,11 @@ unless args.nil? then
   arg_list = args.split("&")
   arg_list.each do |arg|
     key, val = arg.split("=")
-    req[key] = val.gsub("+", " ")
+    if val.nil? then
+      req[key] = ""
+    else
+      req[key] = val.gsub("+", " ")
+    end
   end
 end
 
