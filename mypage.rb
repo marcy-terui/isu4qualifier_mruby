@@ -4,7 +4,7 @@ userdata = Userdata.new "redis_data_key"
 redis    = userdata.redis
 
 req = {}
-args = r.var.args
+args = r.args
 unless args.nil? then
   arg_list = args.split("&")
   arg_list.each do |arg|
@@ -19,73 +19,79 @@ end
 
 login = req.key?("login") ? req['login'] : nil
 
-last_login = redis.exists?("last_login_#{login}") ? {'created_at' => redis.hget("last_login_#{login}", "created_at"), 'ip' => redis.hget("last_login_#{login}", "ip")} : {}
+if login.nil? then
+  Nginx.redirect "http://#{r.var.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
+else
+  Nginx.return Nginx::DECLINED
 
-created_at = last_login['created_at']
-ip         = last_login['ip']
-login      = last_login['login']
+  last_login = redis.exists?("last_login_#{login}") ? {'created_at' => redis.hget("last_login_#{login}", "created_at"), 'ip' => redis.hget("last_login_#{login}", "ip")} : {}
 
-html = <<-EOH
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-    <link rel="stylesheet" href="/stylesheets/bootflat.min.css">
-    <link rel="stylesheet" href="/stylesheets/isucon-bank.css">
-    <title>isucon4</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1 id="topbar">
-        <a href="/"><img src="/images/isucon-bank.png" alt="いすこん銀行 オンラインバンキングサービス"></a>
-      </h1>
-      <div class="alert alert-success" role="alert">
-        ログインに成功しました。<br>
-        未読のお知らせが０件、残っています。
-      </div>
+  created_at = last_login['created_at']
+  ip         = last_login['ip']
+  login      = last_login['login']
 
-      <dl class="dl-horizontal">
-        <dt>前回ログイン</dt>
-        <dd id="last-logined-at">#{created_at}</dd>
-        <dt>最終ログインIPアドレス</dt>
-        <dd id="last-logined-ip">#{ip}</dd>
-      </dl>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">
-        お客様ご契約ID：#{login} 様の代表口座
+  html = <<-EOH
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+      <link rel="stylesheet" href="/stylesheets/bootflat.min.css">
+      <link rel="stylesheet" href="/stylesheets/isucon-bank.css">
+      <title>isucon4</title>
+    </head>
+    <body>
+      <div class="container">
+        <h1 id="topbar">
+          <a href="/"><img src="/images/isucon-bank.png" alt="いすこん銀行 オンラインバンキングサービス"></a>
+        </h1>
+        <div class="alert alert-success" role="alert">
+          ログインに成功しました。<br>
+          未読のお知らせが０件、残っています。
         </div>
-        <div class="panel-body">
-          <div class="row">
-            <div class="col-sm-4">
-              普通預金<br>
-              <small>東京支店　1111111111</small><br>
-            </div>
-            <div class="col-sm-4">
-              <p id="zandaka" class="text-right">
-                ―――円
-              </p>
-            </div>
 
-            <div class="col-sm-4">
-              <p>
-                <a class="btn btn-success btn-block">入出金明細を表示</a>
-                <a class="btn btn-default btn-block">振込・振替はこちらから</a>
-              </p>
-            </div>
+        <dl class="dl-horizontal">
+          <dt>前回ログイン</dt>
+          <dd id="last-logined-at">#{created_at}</dd>
+          <dt>最終ログインIPアドレス</dt>
+          <dd id="last-logined-ip">#{ip}</dd>
+        </dl>
 
-            <div class="col-sm-12">
-              <a class="btn btn-link btn-block">定期預金・住宅ローンのお申込みはこちら</a>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+          お客様ご契約ID：#{login} 様の代表口座
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-4">
+                普通預金<br>
+                <small>東京支店　1111111111</small><br>
+              </div>
+              <div class="col-sm-4">
+                <p id="zandaka" class="text-right">
+                  ―――円
+                </p>
+              </div>
+
+              <div class="col-sm-4">
+                <p>
+                  <a class="btn btn-success btn-block">入出金明細を表示</a>
+                  <a class="btn btn-default btn-block">振込・振替はこちらから</a>
+                </p>
+              </div>
+
+              <div class="col-sm-12">
+                <a class="btn btn-link btn-block">定期預金・住宅ローンのお申込みはこちら</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-  </body>
-</html>
-EOH
+    </body>
+  </html>
+  EOH
 
-Nginx.echo html
-Nginx.return Nginx::HTTP_OK
+  Nginx.echo html
+  Nginx.return Nginx::HTTP_OK
+end
