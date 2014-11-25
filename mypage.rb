@@ -3,8 +3,8 @@ userdata = Userdata.new "redis_data_key"
 redis    = userdata.redis
 
 req = {}
-cookie_str  = r.headers_in['Cookie']
-unless cookie_str.nil?　then
+cookie_str = r.headers_in['Cookie']
+unless cookie_str.nil? then
   cookie_list = cookie_str.split("; ")
   cookie_list.each do |cookie|
     key, val = cookie.split("=")
