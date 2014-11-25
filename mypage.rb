@@ -20,7 +20,9 @@ end
 login = req.key?("login") ? req['login'] : nil
 
 if login.nil? then
-  Nginx.redirect "http://#{r.var.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
+#  Nginx.redirect "http://#{r.var.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
+  r.headers_out["Location"] = "http://#{r.var.http_host}/?notice=You+must+be+logged+in"
+  Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 else
 
   last_login = redis.exists?("last_login_#{login}") ? {'created_at' => redis.hget("last_login_#{login}", "created_at"), 'ip' => redis.hget("last_login_#{login}", "ip")} : {}
