@@ -1,11 +1,10 @@
 r        = Nginx::Request.new
-hin      = Nginx::Headers_in.new
 userdata = Userdata.new "redis_data_key"
 redis    = userdata.redis
 
 req = {}
-if r.headers_in.key?("Cookie") then
-  cookie_str  = r.headers_in['Cookie']
+cookie_str  = r.headers_in['Cookie']
+unless cookie_str.nil?　then
   cookie_list = cookie_str.split("; ")
   cookie_list.each do |cookie|
     key, val = cookie.split("=")
