@@ -59,7 +59,7 @@ elsif !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user['salt']}") == use
   redis.hset("now_login_#{login}", "ip", ip)
 #  Nginx.redirect "http://#{r.var.http_host}/mypage?login=#{login}", Nginx::HTTP_MOVED_TEMPORARILY
   r.headers_out["Set-Cookie"] = "login=#{login}; path=/"
-  r.headers_out["Location"] = "http://#{r.var.http_host}/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/mypage"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 else
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=Wrong+username+or+password", Nginx::HTTP_MOVED_TEMPORARILY
