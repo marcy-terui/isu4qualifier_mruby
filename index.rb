@@ -1,16 +1,17 @@
 r = Nginx::Request.new
 
 req = {}
-args = r.args
-unless args.nil? then
-  arg_list = args.split("&")
-  arg_list.each do |arg|
-    key, val = arg.split("=")
-    req[key] = val.gsub("+", " ")
+if r.headers_in.key?("Cookie") then
+  cookie_str  = r.headers_in['Cookie']
+  cookie_list = cookie_str.split("; ")
+  cookie_list.each do |cookie|
+    key, val = cookie.split("=")
+    req[key] = val
   end
 end
 
 notice = req.key?("notice") ? req['notice'] : nil
+r.headers_out["Set-Cookie"] = "notice=+; expires=Mon, 25-Nov-2013 11:11:11 GMT; path=/"
 
 if notice.nil? then
   notice_message = ""

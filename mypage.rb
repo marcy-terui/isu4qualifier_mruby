@@ -4,16 +4,12 @@ userdata = Userdata.new "redis_data_key"
 redis    = userdata.redis
 
 req = {}
-args = r.args
-unless args.nil? then
-  arg_list = args.split("&")
-  arg_list.each do |arg|
-    key, val = arg.split("=")
-    if val.nil? then
-      req[key] = ""
-    else
-      req[key] = val.gsub("+", " ")
-    end
+if r.headers_in.key?("Cookie") then
+  cookie_str  = r.headers_in['Cookie']
+  cookie_list = cookie_str.split("; ")
+  cookie_list.each do |cookie|
+    key, val = cookie.split("=")
+    req[key] = val
   end
 end
 
@@ -21,7 +17,8 @@ login = req.key?("login") ? req['login'] : nil
 
 if login.nil? then
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=You+must+be+logged+in", Nginx::HTTP_MOVED_TEMPORARILY
-  r.headers_out["Location"] = "http://#{r.var.http_host}/?notice=You+must+be+logged+in"
+  r.headers_out["Set-Cookie"] = "notice=You must be logged in; path=/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 else
 

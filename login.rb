@@ -25,13 +25,15 @@ if ip_fail >= 10 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}") unless login.nil?
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=You're+banned.", Nginx::HTTP_MOVED_TEMPORARILY
-  r.headers_out["Location"] = "http://#{r.var.http_host}/?notice=You're+banned.", Nginx::HTTP_MOVED_TEMPORARILY
+  r.headers_out["Set-Cookie"] = "notice=You're banned.; path=/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 elsif user_fail >= 3 then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}")
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=This+account+is+locked.", Nginx::HTTP_MOVED_TEMPORARILY
-  r.headers_out["Location"] = "http://#{r.var.http_host}/?notice=This+account+is+locked."
+  r.headers_out["Set-Cookie"] = "notice=This account is locked.; path=/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 elsif !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user['salt']}") == user['password_hash'] then
   redis.del("ip_fail_#{ip}")
@@ -56,10 +58,12 @@ elsif !(user.nil?) && Digest::SHA256.hexdigest("#{pass}:#{user['salt']}") == use
   redis.hset("now_login_#{login}", "created_at", "#{year}-#{month}-#{day} #{hour}:#{min}:#{sec}")
   redis.hset("now_login_#{login}", "ip", ip)
 #  Nginx.redirect "http://#{r.var.http_host}/mypage?login=#{login}", Nginx::HTTP_MOVED_TEMPORARILY
-  r.headers_out["Location"] = "http://#{r.var.http_host}/mypage?login=#{login}"
+  r.headers_out["Set-Cookie"] = "login=#{login}; path=/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 else
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=Wrong+username+or+password", Nginx::HTTP_MOVED_TEMPORARILY
-  r.headers_out["Location"] = "http://#{r.var.http_host}/?notice=Wrong+username+or+password"
+  r.headers_out["Set-Cookie"] = "notice=Wrong username or password; path=/"
+  r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
 end
