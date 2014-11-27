@@ -21,14 +21,17 @@ user = redis.exists?("user_#{login}") ? {'login' => redis.hget("user_#{login}", 
 ip_fail = redis.exists?("ip_fail_#{ip}") ? redis.get("ip_fail_#{ip}").to_i : 0
 user_fail = redis.exists?("user_fail_#{login}") ? redis.get("user_fail_#{login}").to_i : 0
 
-if ip_fail >= 10 then
+user_lock_threshold = (ENV['ISU4_USER_LOCK_THRESHOLD'] || 3).to_i,
+ip_ban_threshold    = (ENV['ISU4_IP_BAN_THRESHOLD'] || 10).to_i,
+
+if ip_fail >= ip_ban_threshold then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}") unless login.nil?
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=You're+banned.", Nginx::HTTP_MOVED_TEMPORARILY
   r.headers_out["Set-Cookie"] = "notice=You're banned.; path=/"
   r.headers_out["Location"] = "http://#{r.var.http_host}/"
   Nginx.return Nginx::HTTP_MOVED_TEMPORARILY
-elsif user_fail >= 3 then
+elsif user_fail >= user_lock_threshold then
   redis.incr("ip_fail_#{ip}")
   redis.incr("user_fail_#{login}")
 #  Nginx.redirect "http://#{r.var.http_host}/?notice=This+account+is+locked.", Nginx::HTTP_MOVED_TEMPORARILY
